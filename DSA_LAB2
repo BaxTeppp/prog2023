@@ -10,7 +10,7 @@ struct TrieNode
     bool isEndOfWord;
 };
 
-TrieNode *createNode()
+TrieNode *createNode() // создание узла
 {
     TrieNode *newNode = new TrieNode;
 
@@ -24,7 +24,7 @@ TrieNode *createNode()
     return newNode;
 }
 
-void insert(TrieNode *root, const std::string &word)
+void insert(TrieNode *root, const std::string &word) //Добавление элемента
 {
     TrieNode *curr = root;
 
@@ -43,7 +43,7 @@ void insert(TrieNode *root, const std::string &word)
     curr->isEndOfWord = true;
 }
 
-bool search(TrieNode *root, const std::string &word)
+bool search(TrieNode *root, const std::string &word) //поиск элемента
 {
     TrieNode *curr = root;
 
@@ -62,7 +62,7 @@ bool search(TrieNode *root, const std::string &word)
     return (curr != nullptr && curr->isEndOfWord);
 }
 
-bool startsWith(TrieNode *root, const std::string &prefix)
+bool startsWith(TrieNode *root, const std::string &prefix) // проверка на начало
 {
     TrieNode *curr = root;
 
@@ -80,7 +80,7 @@ bool startsWith(TrieNode *root, const std::string &prefix)
 
     return true;
 }
-void getKeysUtil(TrieNode *root, char *word, int level, std::vector<std::string> &keys)
+void getKeysUtil(TrieNode *root, char *word, int level, std::vector<std::string> &keys) //получение ключей до 
 {
     if (root == nullptr)
     {
@@ -112,7 +112,7 @@ std::vector<std::string> getKeys(TrieNode *root)
     return keys;
 }
 
-bool isEmpty(TrieNode *root)
+bool isEmpty(TrieNode *root) // проверка если пусто
 {
     for (int i = 0; i < ALPHABET_SIZE; i++)
     {
@@ -125,7 +125,7 @@ bool isEmpty(TrieNode *root)
     return true;
 }
 
-void makeEmpty(TrieNode *&root)
+void makeEmpty(TrieNode *&root) // освобождение
 {
     if (root == nullptr)
     {
@@ -144,7 +144,7 @@ void makeEmpty(TrieNode *&root)
     root = nullptr;
 }
 
-void deleteWord(TrieNode *&root, const std::string &word, int level)
+void deleteWord(TrieNode *&root, const std::string &word, int level) //удаление слова
 {
     if (root == nullptr)
     {
@@ -177,7 +177,7 @@ void deleteWord(TrieNode *&root, const std::string &word, int level)
     }
 }
 
-std::string longestPrefixOf(TrieNode *root, const std::string &query)
+std::string longestPrefixOf(TrieNode *root, const std::string &query) // самый длинный префикс
 {
     TrieNode *curr = root;
     std::string prefix;
@@ -197,7 +197,7 @@ std::string longestPrefixOf(TrieNode *root, const std::string &query)
 
     return prefix;
 }
-std::vector<std::string> keysWithPrefix(TrieNode *root, const std::string &prefix)
+std::vector<std::string> keysWithPrefix(TrieNode *root, const std::string &prefix) //найти по префиксу
 {
     std::vector<std::string> keys;
     TrieNode *curr = root;
@@ -223,7 +223,7 @@ std::vector<std::string> keysWithPrefix(TrieNode *root, const std::string &prefi
     delete[] word;
     return keys;
 }
-void keysThatMatchUtil(TrieNode *root, const char *pattern, char *word, int level, std::vector<std::string> &keys)
+void keysThatMatchUtil(TrieNode *root, const char *pattern, char *word, int level, std::vector<std::string> &keys) //все подходящие ключи ДО
 {
     if (root == nullptr)
     {
@@ -263,7 +263,7 @@ void keysThatMatchUtil(TrieNode *root, const char *pattern, char *word, int leve
     }
 }
 
-std::vector<std::string> keysThatMatch(TrieNode *root, const std::string &pattern)
+std::vector<std::string> keysThatMatch(TrieNode *root, const std::string &pattern) //все подходящие ключи
 {
     std::vector<std::string> keys;
     char *word = new char[pattern.length() + 1];
