@@ -1,0 +1,275 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+
+const int ALPHABET_SIZE = 26;
+
+struct TrieNode {
+struct TrieNode* children[ALPHABET_SIZE];
+bool isEndOfWord;
+};
+
+TrieNode* createNode() {
+TrieNode* newNode = new TrieNode;
+
+newNode->isEndOfWord = false;
+
+for (int i = 0; i < ALPHABET_SIZE; i++) {
+newNode->children[i] = nullptr;
+}
+
+return newNode;
+}
+
+void insert(TrieNode* root, const std::string& word) {
+TrieNode* curr = root;
+
+for (char ch : word) {
+int index = ch - 'a';
+
+if (curr->children[index] == nullptr) {
+curr->children[index] = createNode();
+}
+
+curr = curr->children[index];
+}
+
+curr->isEndOfWord = true;
+}
+
+bool search(TrieNode* root, const std::string& word) {
+TrieNode* curr = root;
+
+for (char ch : word) {
+int index = ch - 'a';
+
+if (curr->children[index] == nullptr) {
+return false;
+}
+
+curr = curr->children[index];
+}
+
+return (curr != nullptr && curr->isEndOfWord);
+}
+
+bool startsWith(TrieNode* root, const std::string& prefix) {
+TrieNode* curr = root;
+
+for (char ch : prefix) {
+int index = ch - 'a';
+
+if (curr->children[index] == nullptr) {
+return false;
+}
+
+curr = curr->children[index];
+}
+
+return true;
+}
+void getKeysUtil(TrieNode* root, char* word, int level, std::vector<std::string>& keys) {
+if (root == nullptr) {
+return;
+}
+
+if (root->isEndOfWord) {
+word[level] = '\0';
+keys.push_back(std::string(word));
+}
+
+for (int i = 0; i < ALPHABET_SIZE; i++) {
+if (root->children[i] != nullptr) {
+word[level] = i + 'a';
+getKeysUtil(root->children[i], word, level + 1, keys);
+}
+}
+}
+
+std::vector<std::string> getKeys(TrieNode* root) {
+std::vector<std::string> keys;
+char* word = new char[ALPHABET_SIZE + 1];
+getKeysUtil(root, word, 0, keys);
+delete[] word;
+return keys;
+}
+
+bool isEmpty(TrieNode* root) {
+for (int i = 0; i < ALPHABET_SIZE; i++) {
+if (root->children[i] != nullptr) {
+return false;
+}
+}
+
+return true;
+}
+
+void makeEmpty(TrieNode*& root) {
+if (root == nullptr) {
+return;
+}
+
+for (int i = 0; i < ALPHABET_SIZE; i++) {
+if (root->children[i] != nullptr) {
+makeEmpty(root->children[i]);
+}
+}
+
+delete root;
+root = nullptr;
+}
+
+void deleteWord(TrieNode*& root, const std::string& word, int level) {
+if (root == nullptr) {
+return;
+}
+
+if (level == word.length()) {
+if (root->isEndOfWord) {
+root->isEndOfWord = false;
+}
+
+if (isEmpty(root)) {
+delete root;
+root = nullptr;
+}
+} else {
+int index = word[level] - 'a';
+deleteWord(root->children[index], word, level + 1);
+
+if (isEmpty(root) && !root->isEndOfWord) {
+delete root;
+root = nullptr;
+}
+}
+}
+
+std::string longestPrefixOf(TrieNode* root, const std::string& query) {
+TrieNode* curr = root;
+std::string prefix;
+
+for (char ch : query) {
+int index = ch - 'a';
+
+if (curr->children[index] == nullptr) {
+break;
+}
+
+curr = curr->children[index];
+prefix += ch;
+}
+
+return prefix;
+}
+std::vector<std::string> keysWithPrefix(TrieNode* root, const std::string& prefix) {
+std::vector<std::string> keys;
+TrieNode* curr = root;
+
+for (char ch : prefix) {
+int index = ch - 'a';
+
+if (curr->children[index] == nullptr) {return keys;
+}
+
+curr = curr->children[index];
+}
+
+char* word = new char[prefix.length() + ALPHABET_SIZE];
+strcpy(word, prefix.c_str());
+
+getKeysUtil(curr,
+word, prefix.length(), keys);
+
+delete[] word;
+return keys;
+}
+void keysThatMatchUtil(TrieNode* root, const char* pattern, char* word, int level, std::vector<std::string>& keys) {
+if (root == nullptr) {
+return;
+}
+
+if (level == strlen(pattern)) {
+if (root->isEndOfWord) {
+word[level] = '\0';
+keys.push_back(std::string(word));
+}
+return;
+}
+
+char ch = pattern[level];
+if (ch == '.') {
+for (int i = 0; i < ALPHABET_SIZE; i++) {
+if (root->children[i] != nullptr) {
+word[level] = i + 'a';
+keysThatMatchUtil(root->children[i], pattern, word, level + 1, keys);
+}
+}
+} else {
+int index = ch - 'a';
+if (root->children[index] != nullptr) {
+word[level] = ch;
+keysThatMatchUtil(root->children[index], pattern, word, level + 1, keys);
+}
+}
+}
+
+std::vector<std::string> keysThatMatch(TrieNode* root, const std::string& pattern) {
+std::vector<std::string> keys;
+char* word = new char[pattern.length() + 1];
+strcpy(word, pattern.c_str());
+
+keysThatMatchUtil(root, word, word, 0, keys);
+
+delete[] word;
+return keys;
+}
+
+int main() {
+TrieNode* root = createNode();
+
+insert(root, "apple");
+insert(root, "banana");
+insert(root, "orange");
+insert(root, "pear");
+
+std::cout « "Word 'apple' is " « (search(root, "apple") ? "found" : "not found") « std::endl;
+std::cout « "Word 'orange' is " « (search(root, "orange") ? "found" : "not found") « std::endl;
+
+std::cout « "Words in TrieTree: ";
+std::vector<std::string> words = getKeys(root);
+for (const std::string& word : words) {
+std::cout « word « " ";
+}
+std::cout « std::endl;
+
+deleteWord(root, "orange", 0);
+
+std::cout « "After deleting 'orange', words in TrieTree: ";
+words = getKeys(root);
+for (const std::string& word : words) {
+std::cout « word « " ";
+}
+std::cout « std::endl;
+
+std::cout « "Longest prefix of 'applesauce': " « longestPrefixOf(root, "applesauce") « std::endl;
+
+std::cout « "Words with prefix 'a': ";
+std::vector<std::string> prefixWords = keysWithPrefix(root, "a");
+for (const std::string& word : prefixWords) {
+std::cout « word « " ";
+}
+std::cout « std::endl;
+
+std::cout « "Words that match with pattern 'p..r': ";
+std::vector<std::string> matchedWords = keysThatMatch(root, "p..r");
+for (const std::string& word : matchedWords) {
+std::cout « word « " ";
+}
+std::cout « std::endl;
+
+makeEmpty(root);
+
+std::cout « "TrieTree is " « (isEmpty(root) ? "empty" : "not empty") « std::endl;
+
+return 0;
+}
